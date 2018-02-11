@@ -8,9 +8,10 @@ environment:
       perl_version: 5.26.1.1
     - perl_type: cygwin
 
-install:
-  -ps: |
+build_script:
+- ps: >-
     if (!Get-Variable perl_type -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_type="system"}
+
     if (!Get-Variable perl_version -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_version="5.26.1.1"}
     [environment]::OSVersion.VersionString
     if ($Env:perl_type -eq "system") {
@@ -33,9 +34,8 @@ install:
     cpanm -n Alien::Base IO::Socket::SSL
     cpanm --installdeps -n .
 
-build: off
-
 test_script:
-  -ps: |
+- ps: >-
     echo $Env:PATH
+
     cpanm --test-only -v .
