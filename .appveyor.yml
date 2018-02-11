@@ -21,18 +21,18 @@ build_script:
       elseif ((Test-Path -path "C:\Perl\bin") -and (Test-Path -path "C:\Perl\site\bin")) {
         $Env:PATH = "C:\Perl\site\bin\;C:\Perl\bin\;${Env:PATH}"
       }
-      else { Exit(1) }
-      ppm install mingw dmake
+      else { Exit(1); }
+      ppm install mingw dmake;
     }
     elseif ($Env:perl_type -eq "strawberry") {
       cinst -y StrawberryPerl --version $Env:perl_version;
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
     }
-    else { Exit(1) }
-    perl -V
+    else { Exit(1); }
+    perl -V;
     function cpanm { perl -S cpanm };
-    cpanm -n Alien::Base IO::Socket::SSL
-    cpanm --installdeps -n .
+    cpanm -n Alien::Base IO::Socket::SSL;
+    cpanm --installdeps -n .;
 
 test_script:
 - ps: >-
