@@ -36,6 +36,6 @@ install:
 build: off
 
 test_script:
-  - ps: |
-    echo ${Env:PATH}
+  -ps: |
+    echo $Env:PATH
     cpanm --test-only -v .
