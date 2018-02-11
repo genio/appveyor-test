@@ -22,20 +22,21 @@ build_script:
       }
       else { Exit(1); }
       ppm install mingw dmake App::cpanminus;
+      if (-not $?) { Exit(1); }
     }
     elseif ($Env:perl_type -eq "strawberry") {
       cinst -y StrawberryPerl --version $Env:perl_version;
+      if (-not $?) { Exit(1); }
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
     }
     else { Exit(1); }
     perl -V;
     echo "Path to make: $(perl -MConfig -E 'say $Config{make}')";
-    function cpanm { perl -S cpanm $args };
     cpanm -n Alien::Base IO::Socket::SSL;
+    if (-not $?) { Exit(1); }
     cpanm --installdeps -n .;
+    if (-not $?) { Exit(1); }
 
 test_script:
 - ps: >-
-    echo $Env:PATH
-
     cpanm --test-only -v .
