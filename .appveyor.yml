@@ -1,0 +1,42 @@
+version: '{build}'
+shallow_clone: true
+
+environment:
+  matrix:
+    - perl_type: system
+    - perl_type: strawberry
+      perl_version: 5.26.1.1
+    - perl_type: cygwin
+
+before_build:
+
+install:
+  -ps: |
+    if (!Get-Variable perl_type -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_type="system"}
+    if (!Get-Variable perl_version -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_version="5.26.1.1"}
+    [environment]::OSVersion.VersionString
+    $ORIG_PATH=$Env:PATH
+    if ($Env:perl_type -eq "system") {
+      if ([System.IO.File]::Exists("C:\Perl64\bin") && [System.IO.File]::Exists("C:\Perl64\site\bin")) {
+        $Env:PATH = "C:\Perl64\site\bin\;C:\Perl64\bin\;${Env:PATH}"
+      }
+      elseif ([System.IO.File]::Exists("C:\Perl\bin") && [System.IO.File]::Exists("C:\Perl\site\bin")) {
+        $Env:PATH = "C:\Perl\site\bin\;C:\Perl\bin\;${Env:PATH}"
+      }
+      else { Exit(1) }
+      ppm install mingw dmake
+    }
+    elseif ($Env:perl_type -eq "strawberry") {
+      cinst -y StrawberryPerl --version $Env:perl_version
+      $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}"
+    }
+    else { Exit(1) }
+    perl -V
+    function cpanm { perl -S cpanm }
+    cpanm -n Alien::Base IO::Socket::SSL
+    cpanm --installdeps -n .
+
+build: off
+
+test_script:
+  - 'cpanm --test-only -v .'
