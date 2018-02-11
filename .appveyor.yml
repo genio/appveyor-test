@@ -8,7 +8,7 @@ environment:
       perl_version: 5.26.1.1
     - perl_type: cygwin
 
-test_script:
+install:
   -ps: |
     if (!Get-Variable perl_type -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_type="system"}
     if (!Get-Variable perl_version -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_version="5.26.1.1"}
@@ -33,6 +33,8 @@ test_script:
     function cpanm { perl -S cpanm }
     cpanm -n Alien::Base IO::Socket::SSL
     cpanm --installdeps -n .
-    cpanm --test-only -v .
 
 build: off
+
+test_script:
+  - ps: 'cpanm --test-only -v .'
