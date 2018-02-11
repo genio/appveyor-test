@@ -15,10 +15,10 @@ build_script:
     if (!Get-Variable perl_version -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_version="5.26.1.1"}
     [environment]::OSVersion.VersionString
     if ($Env:perl_type -eq "system") {
-      if ([System.IO.File]::Exists("C:\Perl64\bin") && [System.IO.File]::Exists("C:\Perl64\site\bin")) {
+      if (Test-Path -path "C:\Perl64\bin" -and Test-Path -path "C:\Perl64\site\bin") {
         $Env:PATH = "C:\Perl64\site\bin\;C:\Perl64\bin\;${Env:PATH}"
       }
-      elseif ([System.IO.File]::Exists("C:\Perl\bin") && [System.IO.File]::Exists("C:\Perl\site\bin")) {
+      elseif (Test-Path -path "C:\Perl\bin" -and Test-Path -path "C:\Perl\site\bin") {
         $Env:PATH = "C:\Perl\site\bin\;C:\Perl\bin\;${Env:PATH}"
       }
       else { Exit(1) }
