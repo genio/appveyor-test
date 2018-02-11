@@ -10,10 +10,10 @@ environment:
 
 build_script:
 - ps: >-
-    if (!Get-Variable perl_type -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_type="system"}
+    echo $([environment]::OSVersion.VersionString);
 
+    if (!Get-Variable perl_type -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_type="system"}
     if (!Get-Variable perl_version -Scope Global -ErrorAction SilentlyContinue) {$Env:perl_version="5.26.1.1"}
-    [environment]::OSVersion.VersionString
     if ($Env:perl_type -eq "system") {
       if (Test-Path -path "C:\Perl64\bin" -and Test-Path -path "C:\Perl64\site\bin") {
         $Env:PATH = "C:\Perl64\site\bin\;C:\Perl64\bin\;${Env:PATH}"
