@@ -46,9 +46,7 @@ build_script:
     else { Exit(1); }
 
 test_script:
-- ps: >-
-    perl -V;
-
-    echo "Path to make: $(perl -MConfig -E 'say $Config{make}')";
-    cpanm --installdeps -n .;
-    cpanm -v .
+- ps: 'perl -V'
+- ps: 'echo "Path to make: $(perl -MConfig -E 'say $Config{make}')"'
+- ps: 'cpanm --installdeps -n .'
+- ps: 'cpanm -v .'
