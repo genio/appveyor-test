@@ -29,7 +29,7 @@ build_script:
       if (-not $?) { Write-Error "choco strawberry failed"; Exit(1); }
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
     }
-    elseif ($Env:perl_type eq "cygwin") {
+    elseif ($Env:perl_type -eq "cygwin") {
       if ((Test-Path -path "C:\cygwin64\setup-x86_64.exe")) {
         cmd /c C:\cygwin64\setup-x86_64.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl
         if (-not $?) { Write-Error "cygwin64 setup failed"; Exit(1); }
