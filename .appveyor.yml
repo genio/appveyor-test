@@ -12,6 +12,7 @@ build_script:
 - ps: >-
     echo $([environment]::OSVersion.VersionString);
 
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     if ($Env:perl_type -eq $null) { $Env:perl_type="system"; }
     if ($Env:perl_type -eq "system") {
       if ((Test-Path -path "C:\Perl64\bin") -and (Test-Path -path "C:\Perl64\site\bin")) {
@@ -22,12 +23,14 @@ build_script:
       }
       else { Write-Error "No valid system perl found"; Exit(1); }
       ppm install mingw dmake App::cpanminus > $null;
+      $Env:make = $(perl -MConfig -E 'say $Config{make}');
       if (-not $?) { Write-Error "PPM install failed."; Exit(1); }
     }
     elseif ($Env:perl_type -eq "strawberry") {
       cinst -y StrawberryPerl --version $Env:perl_version  > $null;
       if (-not $?) { Write-Error "choco strawberry failed"; Exit(1); }
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
+      $Env:make = $(perl -MConfig -E 'say $Config{make}');
     }
     elseif ($Env:perl_type -eq "cygwin") {
       if ((Test-Path -path "C:\cygwin64\setup-x86_64.exe")) {
@@ -40,12 +43,19 @@ build_script:
         if (-not $?) { Write-Error "cygwin setup failed"; Exit(1); }
         $Env:PATH = "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;${Env:PATH}";
       }
-      else { Exit(1); }
-      perl -MCPAN -E 'CPAN::Shell->install(q(App::cpanminus))'
+      else { Write-Error("Couldn't find a suitable cygwin"); Exit(1); }
+      Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile cpanm
+      if (-not $?) { Write-Error "Couldn't download cpanm to bootstrap"; Exit(1); }
+      perl cpanm App::cpanminus
+      $Env:make = $(perl -MConfig -E 'say $Config{make}');
     }
-    else { Exit(1); }
+    else { Write-Error "Couldn't find a suitable Perl environment"; Exit(1); }
 
 test_script:
   - 'perl -V'
+  - 'echo "Path to make: %make%"'
   - 'cpanm --installdeps -n .'
-  - 'cpanm -v .'
+  - 'perl Makefile.PL'
+  - '%make%'
+  - '%make% test'
+# - 'cpanm -v .'
