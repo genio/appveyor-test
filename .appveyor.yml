@@ -12,7 +12,7 @@ build_script:
 - ps: >-
     echo $([environment]::OSVersion.VersionString);
 
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $([Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12);
     if ($Env:perl_type -eq $null) { $Env:perl_type="system"; }
     if ($Env:perl_type -eq "system") {
       if ((Test-Path -path "C:\Perl64\bin") -and (Test-Path -path "C:\Perl64\site\bin")) {
