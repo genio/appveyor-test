@@ -60,12 +60,11 @@ build_script:
     }
     else { Write-Error "Couldn't find a suitable Perl environment"; Exit(1); }
     $Env:make = $(perl -MConfig -E 'say $Config{make}');
-    $Env:cpanm = $(perl -S cpanm);
 
 test_script:
   - 'perl -V'
   - 'echo "Path to make: %make%"'
-  - '%cpanm% --installdeps -n .'
+  - 'cpanm --installdeps -n .'
   - 'perl Makefile.PL'
   - '%make%'
   - '%make% test'
