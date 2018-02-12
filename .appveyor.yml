@@ -24,9 +24,8 @@ build_script:
     echo $([environment]::OSVersion.VersionString);
 
     $([Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12);
-    $(Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm);
+    $(Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:TEMP}\_our_cpanm);
     if (-not $?) { Write-Error "Couldn't download cpanm to bootstrap"; Exit(1); }
-    $Env:cpanm = "cpanm";
     if ($Env:perl_type -eq $null) { $Env:perl_type="system"; }
     if ($Env:perl_type -eq "system") {
       if ((Test-Path -path "C:\Perl64\bin") -and (Test-Path -path "C:\Perl64\site\bin")) {
@@ -36,27 +35,22 @@ build_script:
         $Env:PATH = "C:\Perl\site\bin\;C:\Perl\bin\;${Env:PATH}"
       }
       else { Write-Error "No valid system perl found"; Exit(1); }
-      ppm install mingw dmake App::cpanminus > $null;
+      ppm install mingw dmake App::cpanminus local::lib > $null;
       if (-not $?) { Write-Error "PPM install failed."; Exit(1); }
+      Invoke-Expression "$(perl -Mlocal::lib=--shelltype=powershell,${Env:TEMP}/perl5)";
     }
     elseif ($Env:perl_type -eq "strawberry") {
       cinst -y StrawberryPerl --version $Env:perl_version  > $null;
       if (-not $?) { Write-Error "choco strawberry failed"; Exit(1); }
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
+      Invoke-Expression "$(perl ${Env:TEMP}\_our_cpanm App::cpanminus local::lib)";
+      Invoke-Expression "$(perl -Mlocal::lib=--shelltype=powershell,${Env:TEMP}/perl5)";
     }
     elseif ($Env:perl_type -eq "cygwin") {
-      if (($Env:PLATFORM -eq "x64") -and (Test-Path -path "C:\cygwin64\setup-x86_64.exe")) {
-        cmd /c C:\cygwin64\setup-x86_64.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl > $null
-        if (-not $?) { Write-Error "cygwin64 setup failed"; Exit(1); }
-        $Env:PATH = "C:\cygwin64\usr\local\bin;C:\cygwin64\bin;${Env:PATH}";
-      }
-      elseif ((Test-Path -path "C:\cygwin\setup-x86.exe")) {
-        cmd /c C:\cygwin\setup-x86.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl > $null
-        if (-not $?) { Write-Error "cygwin setup failed"; Exit(1); }
-        $Env:PATH = "C:\cygwin\usr\local\bin;C:\cygwin\bin;${Env:PATH}";
-      }
-      else { Write-Error("Couldn't find a suitable cygwin"); Exit(1); }
-      $Env:cpanm = "perl ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm"
+      cmd /c C:\cygwin\setup-x86.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl > $null
+      if (-not $?) { Write-Error "cygwin setup failed"; Exit(1); }
+      $Env:PATH = "C:\cygwin\usr\local\bin;C:\cygwin\bin;${Env:PATH}";
+      Invoke-Expression "$(perl ${Env:TEMP}\_our_cpanm App::cpanminus local::lib --local-lib=C:\cygwin\tmp/perl5)";
     }
     else { Write-Error "Couldn't find a suitable Perl environment"; Exit(1); }
     $Env:make = $(perl -MConfig -E 'say $Config{make}');
@@ -65,7 +59,6 @@ test_script:
   - 'perl -V'
   - 'echo "Path to make: %make%"'
   # we have a downloaded fatpack of cpan in our
-  - '%cpanm% -v App::cpanminus'
   #- 'echo %PATH%'
   - '%cpanm% --installdeps -n .'
   - 'perl Makefile.PL'
