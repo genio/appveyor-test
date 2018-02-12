@@ -46,7 +46,8 @@ build_script:
       else { Write-Error("Couldn't find a suitable cygwin"); Exit(1); }
       Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile cpanm
       if (-not $?) { Write-Error "Couldn't download cpanm to bootstrap"; Exit(1); }
-      perl cpanm App::cpanminus
+      $(perl cpanm App::cpanminus)
+      if (-not $?) { Write-Error "Couldn't install cpanm using bootstrap"; Exit(1); }
       $Env:make = $(perl -MConfig -E 'say $Config{make}');
     }
     else { Write-Error "Couldn't find a suitable Perl environment"; Exit(1); }
