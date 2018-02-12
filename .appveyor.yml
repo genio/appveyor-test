@@ -51,4 +51,4 @@ test_script:
 
     echo "Path to make: $(perl -MConfig -E 'say $Config{make}')";
     cpanm --installdeps -n .;
-    cpanm .
+    cpanm -v .
