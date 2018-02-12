@@ -2,7 +2,9 @@ version: '{build}'
 shallow_clone: true
 
 matrix:
-    fast_finish: true
+  fast_finish: true
+
+platform: x64
 
 environment:
   matrix:
@@ -40,7 +42,7 @@ build_script:
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
     }
     elseif ($Env:perl_type -eq "cygwin") {
-      if ((Test-Path -path "C:\cygwin64\setup-x86_64.exe")) {
+      if (($Env:PLATFORM -eq "x64") -and (Test-Path -path "C:\cygwin64\setup-x86_64.exe")) {
         cmd /c C:\cygwin64\setup-x86_64.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl > $null
         if (-not $?) { Write-Error "cygwin64 setup failed"; Exit(1); }
         $Env:PATH = "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;${Env:PATH}";
