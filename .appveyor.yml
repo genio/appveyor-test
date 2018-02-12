@@ -20,23 +20,35 @@ build_script:
       elseif ((Test-Path -path "C:\Perl\bin") -and (Test-Path -path "C:\Perl\site\bin")) {
         $Env:PATH = "C:\Perl\site\bin\;C:\Perl\bin\;${Env:PATH}"
       }
-      else { Exit(1); }
+      else { Write-Error "No valid system perl found"; Exit(1); }
       ppm install mingw dmake App::cpanminus;
-      if (-not $?) { Exit(1); }
+      if (-not $?) { Write-Error "PPM install failed."; Exit(1); }
     }
     elseif ($Env:perl_type -eq "strawberry") {
       cinst -y StrawberryPerl --version $Env:perl_version;
-      if (-not $?) { Exit(1); }
+      if (-not $?) { Write-Error "choco strawberry failed"; Exit(1); }
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
     }
+    elseif ($Env:perl_type eq "cygwin") {
+      if ((Test-Path -path "C:\cygwin64\setup-x86_64.exe")) {
+        cmd /c C:\cygwin64\setup-x86_64.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl
+        if (-not $?) { Write-Error "cygwin64 setup failed"; Exit(1); }
+        $Env:PATH = "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;${Env:PATH}";
+      }
+      elseif ((Test-Path -path "C:\cygwin\setup-x86.exe")) {
+        cmd /c C:\cygwin64\setup-x86.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl
+        if (-not $?) { Write-Error "cygwin setup failed"; Exit(1); }
+        $Env:PATH = "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;${Env:PATH}";
+        perl -MCPAN -E 'CPAN::Shell->install(q(App::cpanminus))'
+      }
+      else { Exit(1); }
+    }
     else { Exit(1); }
-    perl -V;
-    echo "Path to make: $(perl -MConfig -E 'say $Config{make}')";
-    cpanm -n Alien::Base IO::Socket::SSL;
-    if (-not $?) { Exit(1); }
-    cpanm --installdeps -n .;
-    if (-not $?) { Exit(1); }
 
 test_script:
 - ps: >-
-    cpanm --test-only -v .
+    perl -V;
+
+    echo "Path to make: $(perl -MConfig -E 'say $Config{make}')";
+    cpanm --installdeps -n .;
+    cpanm .
