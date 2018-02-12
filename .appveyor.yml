@@ -53,10 +53,8 @@ build_script:
         $Env:PATH = "C:\cygwin\usr\local\bin;C:\cygwin\bin;${Env:PATH}";
       }
       else { Write-Error("Couldn't find a suitable cygwin"); Exit(1); }
-      Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:TEMP}\cpanm
+      Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm
       if (-not $?) { Write-Error "Couldn't download cpanm to bootstrap"; Exit(1); }
-      $(perl "${Env:TEMP}\cpanm" -n App::cpanminus);
-      if (-not $?) { Write-Error "Couldn't install cpanm using bootstrap"; Exit(1); }
     }
     else { Write-Error "Couldn't find a suitable Perl environment"; Exit(1); }
     $Env:make = $(perl -MConfig -E 'say $Config{make}');
@@ -64,6 +62,8 @@ build_script:
 test_script:
   - 'perl -V'
   - 'echo "Path to make: %make%"'
+  # we have a downloaded fatpack of cpan in our
+  - 'perl _our_cpanm -v App::cpanminus'
   - 'cpanm --installdeps -n .'
   - 'perl Makefile.PL'
   - '%make%'
