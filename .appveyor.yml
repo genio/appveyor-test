@@ -24,6 +24,9 @@ build_script:
     echo $([environment]::OSVersion.VersionString);
 
     $([Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12);
+    Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm
+    if (-not $?) { Write-Error "Couldn't download cpanm to bootstrap"; Exit(1); }
+    $Env:cpanm = "cpanm";
     if ($Env:perl_type -eq $null) { $Env:perl_type="system"; }
     if ($Env:perl_type -eq "system") {
       if ((Test-Path -path "C:\Perl64\bin") -and (Test-Path -path "C:\Perl64\site\bin")) {
@@ -53,8 +56,7 @@ build_script:
         $Env:PATH = "C:\cygwin\usr\local\bin;C:\cygwin\bin;${Env:PATH}";
       }
       else { Write-Error("Couldn't find a suitable cygwin"); Exit(1); }
-      Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm
-      if (-not $?) { Write-Error "Couldn't download cpanm to bootstrap"; Exit(1); }
+      $Env:cpanm = "perl ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm"
     }
     else { Write-Error "Couldn't find a suitable Perl environment"; Exit(1); }
     $Env:make = $(perl -MConfig -E 'say $Config{make}');
@@ -63,8 +65,9 @@ test_script:
   - 'perl -V'
   - 'echo "Path to make: %make%"'
   # we have a downloaded fatpack of cpan in our
-  - 'perl _our_cpanm -v App::cpanminus'
-  - 'cpanm --installdeps -n .'
+  - '%cpanm% -v App::cpanminus'
+  #- 'echo %PATH%'
+  - '%cpanm% --installdeps -n .'
   - 'perl Makefile.PL'
   - '%make%'
   - '%make% test'
