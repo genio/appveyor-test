@@ -38,6 +38,7 @@ build_script:
       ppm install mingw dmake App::cpanminus local::lib > $null;
       if (-not $?) { Write-Error "PPM install failed."; Exit(1); }
       Invoke-Expression "$(perl -Mlocal::lib=--shelltype=powershell,${Env:TEMP}/perl5)";
+      $Env:env = "Get-ChildItem Env:";
     }
     elseif ($Env:perl_type -eq "strawberry") {
       cinst -y StrawberryPerl --version $Env:perl_version  > $null;
@@ -45,12 +46,14 @@ build_script:
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
       Invoke-Expression "$(perl ${Env:TEMP}\_our_cpanm App::cpanminus local::lib)";
       Invoke-Expression "$(perl -Mlocal::lib=--shelltype=powershell,${Env:TEMP}/perl5)";
+      $Env:env = "Get-ChildItem Env:";
     }
     elseif ($Env:perl_type -eq "cygwin") {
       cmd /c C:\cygwin\setup-x86.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl > $null
       if (-not $?) { Write-Error "cygwin setup failed"; Exit(1); }
       $Env:PATH = "C:\cygwin\usr\local\bin;C:\cygwin\bin;${Env:PATH}";
       Invoke-Expression "$(perl ${Env:TEMP}\_our_cpanm App::cpanminus local::lib --local-lib=C:\cygwin\tmp/perl5)";
+      $Env:env = "env";
     }
     else { Write-Error "Couldn't find a suitable Perl environment"; Exit(1); }
     $Env:make = $(perl -MConfig -E 'say $Config{make}');
@@ -58,9 +61,10 @@ build_script:
 test_script:
   - 'perl -V'
   - 'echo "Path to make: %make%"'
+  - '%env%'
   # we have a downloaded fatpack of cpan in our
   #- 'echo %PATH%'
-  - '%cpanm% --installdeps -n .'
+  - 'cpanm --installdeps -n .'
   - 'perl Makefile.PL'
   - '%make%'
   - '%make% test'
