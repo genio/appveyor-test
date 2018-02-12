@@ -60,7 +60,7 @@ build_script:
 test_script:
   - 'perl -V'
   - 'echo "Path to make: %make%"'
-  - 'cygpath -w `which perl`'
+  - 'cygpath -w $HOME'
   - '%env%'
   # we have a downloaded fatpack of cpan in our
   #- 'echo %PATH%'
