@@ -24,7 +24,7 @@ build_script:
     echo $([environment]::OSVersion.VersionString);
 
     $([Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12);
-    Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm
+    $(Invoke-WebRequest -Uri https://cpanmin.us/ -OutFile ${Env:APPVEYOR_BUILD_FOLDER}\_our_cpanm);
     if (-not $?) { Write-Error "Couldn't download cpanm to bootstrap"; Exit(1); }
     $Env:cpanm = "cpanm";
     if ($Env:perl_type -eq $null) { $Env:perl_type="system"; }
