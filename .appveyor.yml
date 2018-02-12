@@ -21,27 +21,27 @@ build_script:
         $Env:PATH = "C:\Perl\site\bin\;C:\Perl\bin\;${Env:PATH}"
       }
       else { Write-Error "No valid system perl found"; Exit(1); }
-      ppm install mingw dmake App::cpanminus;
+      ppm install mingw dmake App::cpanminus > $null;
       if (-not $?) { Write-Error "PPM install failed."; Exit(1); }
     }
     elseif ($Env:perl_type -eq "strawberry") {
-      cinst -y StrawberryPerl --version $Env:perl_version;
+      cinst -y StrawberryPerl --version $Env:perl_version  > $null;
       if (-not $?) { Write-Error "choco strawberry failed"; Exit(1); }
       $Env:PATH = "C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;${Env:PATH}";
     }
     elseif ($Env:perl_type -eq "cygwin") {
       if ((Test-Path -path "C:\cygwin64\setup-x86_64.exe")) {
-        cmd /c C:\cygwin64\setup-x86_64.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl
+        cmd /c C:\cygwin64\setup-x86_64.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl > $null
         if (-not $?) { Write-Error "cygwin64 setup failed"; Exit(1); }
         $Env:PATH = "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;${Env:PATH}";
       }
       elseif ((Test-Path -path "C:\cygwin\setup-x86.exe")) {
-        cmd /c C:\cygwin64\setup-x86.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl
+        cmd /c C:\cygwin64\setup-x86.exe -q -g -P perl -P make -P gcc -P gcc-g++ -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl > $null
         if (-not $?) { Write-Error "cygwin setup failed"; Exit(1); }
         $Env:PATH = "PATH=C:\cygwin64\usr\local\bin;C:\cygwin64\bin;${Env:PATH}";
-        perl -MCPAN -E 'CPAN::Shell->install(q(App::cpanminus))'
       }
       else { Exit(1); }
+      perl -MCPAN -E 'CPAN::Shell->install(q(App::cpanminus))'
     }
     else { Exit(1); }
 
