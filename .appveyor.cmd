@@ -7,6 +7,7 @@ if not defined perl_type set perl_type=system
 if "%perl_type%" == "cygwin" (
   start /wait c:\cygwin\setup-x86.exe -q -g -P perl -P binutils -P make -P gcc -P gcc-core -P gcc-g++ -P make -P pkg-config -P libcrypt-devel -P openssl-devel -P autoconf -P automake -P libtool -P curl
   set "PATH=C:\cygwin\usr\local\bin;C:\cygwin\bin;%PATH%"
+  set "PKG_CONFIG_PATH=c:\cygwin\usr\local\lib\pkgconfig"
 ) else if "%perl_type%" == "strawberry" (
   if not defined perl_version (
     cinst -y StrawberryPerl
