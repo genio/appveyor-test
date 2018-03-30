@@ -10,6 +10,7 @@ if "%perl_type%" == "cygwin" (
   set "PATH=C:\cygwin\usr\local\bin;C:\cygwin\bin;%PATH%"
   set "PKG_CONFIG_PATH=c:\cygwin\usr\local\lib\pkgconfig"
 ) else if "%perl_type%" == "strawberry" (
+  echo "Setting up Strawberry Perl"
   if not defined perl_version (
     cinst -y StrawberryPerl
   ) else (
@@ -21,6 +22,7 @@ if "%perl_type%" == "cygwin" (
   )
   set "PATH=C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%"
 ) else if "%perl_type%" == "activestate" (
+  echo "Setting up ActiveState Perl"
   set "PATH=C:\Perl\bin;C:\Perl\site\bin;%PATH%"
   ppm install MinGW dmake App::cpanminus
 ) else (

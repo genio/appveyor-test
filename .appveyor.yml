@@ -25,6 +25,7 @@ environment:
 
 install:
   - 'call .appveyor.cmd perl_setup'
+  - env
   - '%perl% -V'
   - '%cpanm% --installdeps -n --with-develop --with-recommends .'
 
