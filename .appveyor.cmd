@@ -24,7 +24,8 @@ if "%perl_type%" == "cygwin" (
 ) else if "%perl_type%" == "activestate" (
   echo "Setting up ActiveState Perl"
   set "PATH=C:\Perl\bin;C:\Perl\site\bin;%PATH%"
-  ppm install MinGW dmake App::cpanminus
+  start /wait C:\Perl\bin\ppm.bat install MinGW dmake App::cpanminus
+  echo "got here"
 ) else (
   echo.Unknown perl type "%perl_type%"! 1>&2
   exit /b 1
