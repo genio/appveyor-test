@@ -23,7 +23,7 @@ if "%perl_type%" == "cygwin" (
   set "PATH=C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%"
 ) else if "%perl_type%" == "activestate" (
   echo "Setting up ActiveState Perl"
-  set "PATH=C:\Perl\bin;C:\Perl\site\bin;%PATH%"
+  set "perl=perl"
   C:\Perl\bin\ppm.bat install MinGW dmake
   echo "got here"
 ) else (
