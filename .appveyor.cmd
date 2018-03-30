@@ -20,6 +20,7 @@ if "%perl_type%" == "cygwin" (
   )
   set "PATH=C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;%PATH%"
 ) else if "%perl_type%" == "activestate" (
+  set "PATH=C:\Perl\bin;C:\Perl\site\bin;%PATH%"
   ppm install MinGW dmake App::cpanminus
 ) else (
   echo.Unknown perl type "%perl_type%"! 1>&2
