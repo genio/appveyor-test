@@ -40,7 +40,7 @@ sub WINVER() {
     return '0x0602' if $ver =~ /^Win8/;
     return '0x0A00' if $ver =~ /^Win10/;
 
-    warn "We couldn't determine the version of Windows you're on.";
+    warn "We couldn't determine the version of Windows you're on. -- $ver";
     return undef;
 
 }
